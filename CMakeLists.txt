@@ -21,5 +21,5 @@ target_link_libraries(tests ObliviousShuffle)
 add_test(NAME TestSuite COMMAND tests)
 
 # # 添加性能测试
-# add_executable(benchmarks benchmarks/benchmark_main.cpp benchmarks/*.cpp)
-# target_include_directories(benchmarks PUBLIC include)
+add_executable(benchmarks benchmarks/benchmark_oblivious_shuffle.cpp)
+target_link_libraries(benchmarks ObliviousShuffle)
