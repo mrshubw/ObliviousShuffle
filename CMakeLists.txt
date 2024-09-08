@@ -14,11 +14,11 @@ add_library(ObliviousShuffle ${SRC})
 # 添加头文件目录
 target_include_directories(ObliviousShuffle PUBLIC include)
 
-# # 添加测试
-# enable_testing()
-# add_executable(tests tests/test_main.cpp tests/*.cpp)
-# target_include_directories(tests PUBLIC include)
-# add_test(NAME TestSuite COMMAND tests)
+# 添加测试
+enable_testing()
+add_executable(tests tests/test_oblivious_shuffle.cpp)
+target_link_libraries(tests ObliviousShuffle)
+add_test(NAME TestSuite COMMAND tests)
 
 # # 添加性能测试
 # add_executable(benchmarks benchmarks/benchmark_main.cpp benchmarks/*.cpp)
