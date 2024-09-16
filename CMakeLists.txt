@@ -14,12 +14,14 @@ add_library(ObliviousShuffle ${SRC})
 # 添加头文件目录
 target_include_directories(ObliviousShuffle PUBLIC include)
 
+# 启用CTest功能
+include(CTest)
 # 添加测试
 enable_testing()
-add_executable(tests tests/test_oblivious_shuffle.cpp)
+add_executable(tests tests/test_bitonic_sorter.cpp)
 target_link_libraries(tests ObliviousShuffle)
-add_test(NAME TestSuite COMMAND tests)
+add_test(NAME TestBitonicSorter COMMAND tests)
 
-# # 添加性能测试
-add_executable(benchmarks benchmarks/benchmark_oblivious_shuffle.cpp)
-target_link_libraries(benchmarks ObliviousShuffle)
+# # # 添加性能测试
+# add_executable(benchmarks benchmarks/benchmark_oblivious_shuffle.cpp)
+# target_link_libraries(benchmarks ObliviousShuffle)
