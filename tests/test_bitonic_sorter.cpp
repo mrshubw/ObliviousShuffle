@@ -1,7 +1,7 @@
 #include <cassert>
 #include <vector>
 #include <iostream>
-#include "bitonic_sorter.h"
+#include "sorter.h"
 
 void test_bitonic_sort() {
     obl::BitonicSorter bitonic_sort;

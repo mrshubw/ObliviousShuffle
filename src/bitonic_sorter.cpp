@@ -1,4 +1,4 @@
-#include "bitonic_sorter.h"
+#include "sorter.h"
 
 namespace obl {
 
