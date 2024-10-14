@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 project(ObliviousShuffle)
 
 # 设置C++标准
@@ -7,19 +7,30 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 递归获取src目录下的所有源文件
 file(GLOB_RECURSE SRC src/*.cpp)
-
 # 添加库
 add_library(ObliviousShuffle ${SRC})
-
 # 添加头文件目录
 target_include_directories(ObliviousShuffle PUBLIC include)
 
+# 设置第三方库
+# 引入 FetchContent 模块
+include(FetchContent)
+# 声明并下载 gtest
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG v1.15.2  # 指定 gtest 版本
+)
+# 下载并准备 gtest
+FetchContent_MakeAvailable(googletest)
+
+# 设置单元测试
 # 启用CTest功能
 include(CTest)
 # 添加测试
 enable_testing()
 add_executable(tests tests/test_bitonic_sorter.cpp)
-target_link_libraries(tests ObliviousShuffle)
+target_link_libraries(tests ObliviousShuffle gtest gtest_main)
 add_test(NAME TestBitonicSorter COMMAND tests)
 
 # # # 添加性能测试

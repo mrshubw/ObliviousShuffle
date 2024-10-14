@@ -1,29 +1,100 @@
-#include <cassert>
 #include <vector>
-#include <iostream>
+#include <algorithm>
+#include <random>
+#include <gtest/gtest.h>
 #include "sorter.h"
 
-// 辅助函数，用于排序并验证结果
-void test_sort(const std::vector<int>& input, const std::vector<int>& expected) {
+// 全局的测试函数
+void test_bitonic_sort(const std::vector<int>& input, const std::vector<int>& expected) {
     obl::BitonicSorter bitonic_sort;
     std::vector<int> copy = input; // 创建输入的副本
     bitonic_sort.sort(copy);
-    assert(copy == expected); // 验证排序结果
+    ASSERT_EQ(copy, expected); // 验证排序结果
 }
 
-void test_bitonic_sort() {
-    // 测试用例
-    test_sort({4, 1, 3, 2}, {1, 2, 3, 4}); // 4个元素的数组
-    test_sort({8, 5, 6, 2, 3, 4, 1, 7}, {1, 2, 3, 4, 5, 6, 7, 8}); // 8个元素的数组
-    test_sort({3, 1}, {1, 3}); // 2个元素的数组
-    test_sort({1, 2, 3, 4, 5, 6, 7, 8}, {1, 2, 3, 4, 5, 6, 7, 8}); // 已排序数组
-    test_sort({3, 1, 2, 1, 3, 4, 4, 2}, {1, 1, 2, 2, 3, 3, 4, 4}); // 重复元素数组
-    test_sort({5, 5, 5, 5, 5, 5, 5, 5}, {5, 5, 5, 5, 5, 5, 5, 5}); // 相同元素数组
+class BitonicSortTestHelper {
+public:
+    // 生成测试数据的函数
+    static std::vector<int> generate_test_data(int case_type, int size) {
+        std::vector<int> data(size);
+        switch (case_type) {
+            case 0: // 随机数组
+                fill_random_array(data);
+                break;
+            case 1: // 逆序数组
+                fill_descending_array(data);
+                break;
+            case 2: // 正序数组
+                fill_ascending_array(data);
+                break;
+            case 3: // 包含重复元素的数组
+                fill_array_with_duplicates(data);
+                break;
+            case 4: // 包含负数的数组
+                fill_array_with_negatives(data);
+                break;
+            case 5: // 空数组
+                data.clear();
+                break;
+            case 6: // 单元素数组
+                data = {1};
+                break;
+            default:
+                throw std::invalid_argument("Invalid case type");
+        }
+        return data;
+    }
 
-    std::cout << "All Bitonic Sort tests passed!" << std::endl;
+    // 验证排序结果
+    static void verify_sort(const std::vector<int>& data) {
+        std::vector<int> sorted_data = data;
+        std::sort(sorted_data.begin(), sorted_data.end());
+        test_bitonic_sort(data, sorted_data);
+    }
+
+private:
+    static void fill_random_array(std::vector<int>& data) {
+        std::mt19937 gen(std::random_device{}());
+        std::uniform_int_distribution<int> dist(1, 1000);
+        std::generate(data.begin(), data.end(), [&]() { return dist(gen); });
+    }
+
+    static void fill_descending_array(std::vector<int>& data) {
+        std::iota(data.begin(), data.end(), 1);
+        std::reverse(data.begin(), data.end());
+    }
+
+    static void fill_ascending_array(std::vector<int>& data) {
+        std::iota(data.begin(), data.end(), 1);
+    }
+
+    static void fill_array_with_duplicates(std::vector<int>& data) {
+        std::mt19937 gen(std::random_device{}());
+        std::uniform_int_distribution<int> dist(1, data.size() / 10);
+        for (int i = 0; i < data.size(); ++i) {
+            data[i] = dist(gen);
+        }
+    }
+
+    static void fill_array_with_negatives(std::vector<int>& data) {
+        std::mt19937 gen(std::random_device{}());
+        std::uniform_int_distribution<int> dist(-500, 500);
+        std::generate(data.begin(), data.end(), [&]() { return dist(gen); });
+    }
+};
+
+// 参数化测试
+TEST(BitonicSortTests, TestVariousArrayTypes) {
+    const std::vector<int> sizes = {0, 1, 5, 10, 20, 100};
+    for (int size : sizes) {
+        for (int case_type = 0; case_type <= 6; ++case_type) {
+            auto data = BitonicSortTestHelper::generate_test_data(case_type, size);
+            BitonicSortTestHelper::verify_sort(data);
+        }
+    }
 }
 
-int main() {
-    test_bitonic_sort();
-    return 0;
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

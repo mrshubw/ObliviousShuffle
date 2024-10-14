@@ -1,4 +1,5 @@
 #include "sorter.h"
+#include <cmath> // 添加头文件以使用 log2 和 pow
 
 namespace obl {
 
@@ -36,8 +37,19 @@ namespace obl {
 
     // 重写 sort 方法
     void BitonicSorter::sort(std::vector<int>& array) {
+        int n = array.size();
+        // 计算填充到下一个2的幂次的长度
+        int next_power_of_2 = pow(2, std::ceil(log2(n)));
+        array.resize(next_power_of_2); // 调整数组大小
+
+        // 使用最大值填充新增加的部分
+        std::fill(array.begin() + n, array.end(), std::numeric_limits<int>::max());
+
         // 对整个数组进行双调排序
         bitonic_sort(array, 0, array.size(), true);
+
+        // 裁剪数组，去掉填充的元素
+        array.resize(n);
     }
 
 }
