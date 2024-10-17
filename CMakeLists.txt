@@ -33,6 +33,17 @@ add_executable(tests tests/test_bitonic_sorter.cpp)
 target_link_libraries(tests ObliviousShuffle gtest gtest_main)
 add_test(NAME TestBitonicSorter COMMAND tests)
 
-# # # 添加性能测试
-# add_executable(benchmarks benchmarks/benchmark_oblivious_shuffle.cpp)
-# target_link_libraries(benchmarks ObliviousShuffle)
+# 设置选项以禁用测试
+set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "")
+# 添加 Google Benchmark
+FetchContent_Declare(
+    benchmark
+    GIT_REPOSITORY https://github.com/google/benchmark.git
+    GIT_TAG        main  # 可以指定具体的版本
+)
+FetchContent_MakeAvailable(benchmark)
+
+# # 添加性能测试
+add_executable(benchmarks benchmarks/benchmark_bitonic_sorter.cpp)
+target_link_libraries(benchmarks ObliviousShuffle benchmark)
+add_test(NAME BenchmarkBitonicSorter COMMAND benchmarks)
