@@ -67,11 +67,27 @@ protected:
     }
 };
 
-using BitonicSortTest = SortTestHelper<obl::BitonicSorter>;
 // 在可能的输入大小和输入类型上测试排序算法
-TEST_F(BitonicSortTest, TestRandomArray) {
-    std::vector<int> test_size = {8, 128, 1024};
+using BitonicSortIntTest = SortTestHelper<obl::BitonicSorter<int>>;
+TEST_F(BitonicSortIntTest, TestRandomArray) {
+    std::vector<int> test_size = {8, 128, 1024, 10, 100, 1000};
     for (int size : test_size) {
         testRandomArray<int>(size);
+    }
+}
+
+using BitonicSortDoubleTest = SortTestHelper<obl::BitonicSorter<double>>;
+TEST_F(BitonicSortDoubleTest, TestRandomArray) {
+    std::vector<int> test_size = {8, 128, 1024, 10, 100, 1000};
+    for (int size : test_size) {
+        testRandomArray<double>(size);
+    }
+}
+
+using BitonicSortStringTest = SortTestHelper<obl::BitonicSorter<std::string>>;
+TEST_F(BitonicSortStringTest, TestRandomArray) {
+    std::vector<int> test_size = {8, 128, 1024, 10, 100, 1000};
+    for (int size : test_size) {
+        testRandomArray<std::string>(size);
     }
 }

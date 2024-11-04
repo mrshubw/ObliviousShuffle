@@ -1,21 +1,32 @@
 #pragma once
 #include <vector>
+#include <string>
+#include <obl_primitives_ext.h>
 
 namespace obl {
 
-    class Sorter {
+    template<typename KeyType>
+    class OSorter {
     public:
-        virtual ~Sorter() = default;
-        virtual void sort(std::vector<int>& array) = 0; // 纯虚函数，具体算法需实现
+        virtual ~OSorter() = default;
+        virtual void sort(std::vector<KeyType>& array) = 0; // 纯虚函数，具体算法需实现
+        
+    protected:
+        // 比较并交换
+        inline void compare_and_swap(KeyType& a, KeyType& b, bool ascend){
+            if ((a > b && ascend) || (a < b && !ascend)) {
+            std::swap(a, b);
+            }
+        };
     };
 
-    class BitonicSorter : public Sorter {
+    template<typename KeyType>
+    class BitonicSorter : public OSorter<KeyType> {
     public:
-        void sort(std::vector<int>& array) override; // 重写基类的 sort 方法
+        void sort(std::vector<KeyType>& array) override; // 重写基类的 sort 方法
         
     private:
-        void compare_and_swap(int& a, int& b, bool dir); // 比较并交换
-        void bitonic_merge(std::vector<int>& array, int low, int cnt, bool dir); // 合并双调序列
-        void bitonic_sort(std::vector<int>& array, int low, int cnt, bool dir); // 递归排序
+        void bitonicMerge(unsigned char *buffer, size_t N, bool ascend); // 合并双调序列
+        void bitonicSort(unsigned char *buffer, size_t N, bool ascend); // 递归排序
     };
 }

@@ -1,55 +1,80 @@
 #include "sorter.h"
-#include <cmath> // 添加头文件以使用 log2 和 pow
+#include <utils.h>
 
 namespace obl {
 
-    // 比较并交换两个元素
-    void BitonicSorter::compare_and_swap(int& a, int& b, bool dir) {
-        if ((a > b && dir) || (a < b && !dir)) {
-            std::swap(a, b);
-        }
-    }
-
     // 递归进行双调排序
-    void BitonicSorter::bitonic_merge(std::vector<int>& array, int low, int cnt, bool dir) {
-        if (cnt > 1) {
-            int k = cnt / 2;
-            for (int i = low; i < low + k; i++) {
-                compare_and_swap(array[i], array[i + k], dir);
+    template<typename KeyType>
+    void BitonicSorter<KeyType>::bitonicMerge(unsigned char *buffer, size_t N, bool ascend) {
+        size_t block_size = sizeof(KeyType);
+        if(N<2){
+            return;
+        }
+        else if((N & (N * -1))!=N) {
+            size_t M = pow2_lt(N);
+            unsigned char *block1 = buffer;
+            unsigned char *block2 = buffer + (M * block_size); 
+            size_t feasible_swaps = N - M;
+
+            for(size_t i=0; i<feasible_swaps; i++) {
+                uint8_t swap_flag = ogt<KeyType>((KeyType*)block1, (KeyType*)block2);
+                if(ascend){
+                    oswap(block1, block2, block_size, swap_flag);
+                } else {
+                    oswap(block1, block2, block_size, !swap_flag);
+                }
+                block1+=block_size;
+                block2+=block_size; 
             }
-            bitonic_merge(array, low, k, dir);
-            bitonic_merge(array, low + k, k, dir);
+        
+            bitonicMerge(buffer, M,  ascend);
+            bitonicMerge(buffer + (M * block_size), N-M, ascend);
+        } 
+        else{ //Power of 2 case
+            size_t split = N/2;
+            unsigned char *block1 = buffer;
+            unsigned char *block2 = buffer + (split * block_size); 
+            
+            for(size_t i=0; i<split; i++) {
+                uint8_t swap_flag = ogt<KeyType>((KeyType*)block1, (KeyType*)block2);
+                if(ascend){
+                    oswap(block1, block2, block_size, swap_flag);
+                } else {
+                    oswap(block1, block2, block_size, !swap_flag);
+                }
+                block1+=block_size;
+                block2+=block_size; 
+            } 
+
+            bitonicMerge(buffer, split, ascend);
+            bitonicMerge(buffer + (split * block_size), split,  ascend);
         }
     }
 
     // 双调排序算法
-    void BitonicSorter::bitonic_sort(std::vector<int>& array, int low, int cnt, bool dir) {
-        if (cnt > 1) {
-            int k = cnt / 2;
-            // 先对前一半排序，升序
-            bitonic_sort(array, low, k, true);
-            // 后一半排序，降序
-            bitonic_sort(array, low + k, k, false);
-            // 合并两个部分
-            bitonic_merge(array, low, cnt, dir);
+    template<typename KeyType>
+    void BitonicSorter<KeyType>::bitonicSort(unsigned char *buffer, size_t N, bool ascend) {
+        size_t block_size = sizeof(KeyType);
+        if(N < 2){
+            return;
+        }
+        else {  // Handle non-power of 2 case:
+            size_t N1 = N/2; 
+            bitonicSort(buffer, N1, !ascend);
+            bitonicSort(buffer + (block_size * N1), N-N1, ascend);
+            bitonicMerge(buffer, N, ascend);
         }
     }
 
     // 重写 sort 方法
-    void BitonicSorter::sort(std::vector<int>& array) {
-        int n = array.size();
-        // 计算填充到下一个2的幂次的长度
-        int next_power_of_2 = pow(2, std::ceil(log2(n)));
-        array.resize(next_power_of_2); // 调整数组大小
-
-        // 使用最大值填充新增加的部分
-        std::fill(array.begin() + n, array.end(), std::numeric_limits<int>::max());
-
+    template<typename KeyType>
+    void BitonicSorter<KeyType>::sort(std::vector<KeyType>& array) {
         // 对整个数组进行双调排序
-        bitonic_sort(array, 0, array.size(), true);
+        bitonicSort((unsigned char*)array.data(), array.size(), true);
 
-        // 裁剪数组，去掉填充的元素
-        array.resize(n);
     }
 
+    template class obl::BitonicSorter<int>; 
+    template class obl::BitonicSorter<double>; 
+    template class obl::BitonicSorter<std::string>; 
 }
