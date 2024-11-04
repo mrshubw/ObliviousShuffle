@@ -36,9 +36,9 @@ FetchContent_MakeAvailable(googletest)
 include(CTest)
 # 添加测试
 enable_testing()
-add_executable(tests tests/test_bitonic_sorter.cpp)
-target_link_libraries(tests ObliviousShuffle gtest gtest_main)
-add_test(NAME TestBitonicSorter COMMAND tests)
+add_executable(testSorter tests/test_sorter.cpp)
+target_link_libraries(testSorter ObliviousShuffle gtest gtest_main)
+add_test(NAME TestSorter COMMAND testSorter)
 
 add_executable(testShuffler tests/test_shuffler.cpp)
 target_link_libraries(testShuffler ObliviousShuffle gtest gtest_main)
@@ -47,6 +47,10 @@ add_test(NAME TestShuffler COMMAND testShuffler)
 add_executable(testOblPrimitives tests/test_obl_primitives.cpp)
 target_link_libraries(testOblPrimitives ObliviousShuffle gtest gtest_main)
 add_test(NAME TestOblPrimitives COMMAND testOblPrimitives)
+
+add_executable(testPSRR tests/test_psrr.cpp)
+target_link_libraries(testPSRR ObliviousShuffle gtest gtest_main)
+add_test(NAME TestPSRR COMMAND testPSRR)
 
 # 设置选项以禁用测试
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "")
