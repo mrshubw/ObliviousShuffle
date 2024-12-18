@@ -14,7 +14,7 @@ static void BM_BitonicSort(benchmark::State& state) {
     }
 
     // 创建 BitonicSorter 实例
-    obl::BitonicSorter sorter;
+    obl::BitonicSorter<int> sorter;
 
     for (auto _ : state) {
         // 每次迭代前都需要重置数据

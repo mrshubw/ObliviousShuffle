@@ -33,6 +33,10 @@ add_executable(tests tests/test_bitonic_sorter.cpp)
 target_link_libraries(tests ObliviousShuffle gtest gtest_main)
 add_test(NAME TestBitonicSorter COMMAND tests)
 
+add_executable(testOblPrimitives tests/test_obl_primitives.cpp)
+target_link_libraries(testOblPrimitives ObliviousShuffle gtest gtest_main)
+add_test(NAME TestOblPrimitives COMMAND testOblPrimitives)
+
 # 设置选项以禁用测试
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "")
 # 添加 Google Benchmark
