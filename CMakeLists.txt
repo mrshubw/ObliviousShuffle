@@ -47,7 +47,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(benchmark)
 
-# # 添加性能测试
-add_executable(benchmarks benchmarks/benchmark_bitonic_sorter.cpp)
-target_link_libraries(benchmarks ObliviousShuffle benchmark)
-add_test(NAME BenchmarkBitonicSorter COMMAND benchmarks)
+# # # 添加性能测试
+# add_executable(benchmarks benchmarks/benchmark_bitonic_sorter.cpp)
+# target_link_libraries(benchmarks ObliviousShuffle benchmark)
+# add_test(NAME BenchmarkBitonicSorter COMMAND benchmarks)

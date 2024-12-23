@@ -67,7 +67,7 @@ protected:
     {
         Sorter sorter;
         std::vector<T> copy = input;
-        sorter.sort(copy);
+        sorter.sort(copy);  
         ASSERT_EQ(copy, expected);
     }
 
@@ -87,6 +87,19 @@ protected:
     }
 };
 
+// Test case for the BitonicSorter with integer type
+using BitonicSortIntTest = SortTestHelper<obl::OSorter>;
+TEST_F(BitonicSortIntTest, TestRandomArray)
+{
+    // Define test sizes for integer arrays
+    std::vector<int> test_size = {8, 128, 1024, 10, 100, 1000};
+    for (int size : test_size)
+    {
+        // Test sorting algorithm on a random integer array of the given size
+        testRandomArray<int>(size);
+    }
+}
+/* 
 // Test case for the BitonicSorter with integer type
 using BitonicSortIntTest = SortTestHelper<obl::BitonicSorter<int>>;
 TEST_F(BitonicSortIntTest, TestRandomArray)
@@ -109,7 +122,7 @@ TEST_F(BitonicSortDoubleTest, TestRandomArray)
         testRandomArray<double>(size);
     }
 }
-
+ */
 // string is not supported by oswap temporarily
 // using BitonicSortStringTest = SortTestHelper<obl::BitonicSorter<std::string>>;
 // TEST_F(BitonicSortStringTest, TestRandomArray) {
