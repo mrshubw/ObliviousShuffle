@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "obl_primitives_ext.h"  // 包含包含 oswap 函数的头文件
+#include "wakson/oasm_lib.h"  // 包含包含 oswap 函数的头文件
 
 // 测试 oswap 函数
 TEST(OSwapTest, SwapBlocks) {

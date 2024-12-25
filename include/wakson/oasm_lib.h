@@ -25,7 +25,7 @@
   // #endif
 
   #include <stdint.h>
-
+/* 
   // Oblivious Buffer move/swap functions:
 	extern "C" void oswap_buffer_16x(unsigned char *dest, unsigned char *source, uint32_t buffersize, uint8_t flag);
 	extern "C" void oswap_buffer_byte(unsigned char *dest, unsigned char *source, uint32_t buffersize, uint8_t flag);
@@ -34,6 +34,18 @@
 	extern "C" void oswap_buffer_byte_v2(unsigned char *dest, unsigned char *source, uint8_t flag);
 
 	extern "C" void ogt_comp_swap(uint64_t *key1, uint64_t *key2, unsigned char *buff1, unsigned char *buff2, uint32_t buffersize);
+ */
+
+  // 占位，用于确定oswap_buffer的正确性，目前不是oblivious
+  inline void oswap(uint8_t *block1, uint8_t *block2, size_t block_size, bool swap_flag){
+    if(swap_flag){
+        for(size_t i=0; i<block_size; i++){
+            uint8_t temp = block1[i];
+            block1[i] = block2[i];
+            block2[i] = temp;
+        }
+    }
+  }
 
   enum OSwap_Style { OSWAP_4, OSWAP_8, OSWAP_12, OSWAP_16X, OSWAP_8_16X };
   template<OSwap_Style oswap_style> inline void oswap_buffer(unsigned char *dest, unsigned char *source, uint32_t buffersize, uint8_t flag);

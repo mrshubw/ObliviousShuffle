@@ -2,7 +2,6 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include <obl_primitives_ext.h>
 #include "wakson/SortingNetwork/SortingNetwork.hpp"
 
 namespace obl {

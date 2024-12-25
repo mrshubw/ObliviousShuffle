@@ -4,7 +4,6 @@
   // #include <sgx_tcrypto.h>
   #include "wakson/oasm_lib.h"
   #include "wakson/utils.hpp"
-  #include "wakson/ObliviousPrimitives.hpp"
   #include "wakson/RecursiveShuffle/RecursiveShuffle.hpp"
 #endif
 

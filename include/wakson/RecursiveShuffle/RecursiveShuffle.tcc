@@ -1,9 +1,11 @@
 #ifndef __RECURSIVESHUFFLE_TCC__
 #define __RECURSIVESHUFFLE_TCC__
-
+/* 
 #ifndef BEFTS_MODE
   #include "../ObliviousPrimitives.hpp"
 #endif
+ */
+#include "wakson/TightCompaction/TightCompaction_v2.hpp"
 
 // template<OSwap_Style oswap_style>
 // void RecursiveShuffle_M2_inner(unsigned char *buf, uint64_t N, size_t block_size, bool *selected_list) {

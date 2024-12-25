@@ -10,7 +10,6 @@
   #include "../foav.h"
 #endif
 #include <iostream>
-#include "obl_primitives_ext.h"
 /* 
 template<OSwap_Style oswap_style>
 void TightCompact_2power(unsigned char *buf, size_t N, size_t block_size,
@@ -36,9 +35,9 @@ template<OSwap_Style oswap_style>
 void TightCompact_2power_inner_parallel(unsigned char *buf, size_t N,
       size_t block_size, size_t offset, bool *selected, uint32_t *selected_count,
       size_t nthreads);
- */
 template <OSwap_Style oswap_style>
 void OP_TightCompact_v2(unsigned char *buf, size_t block_size, bool *selected_list);
+ */
 
 void compute_LS_distances(uint64_t N, unsigned char *buffer_start, size_t block_size, 
         bool *selected_list, uint64_t *LS_distance);

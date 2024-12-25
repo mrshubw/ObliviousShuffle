@@ -43,10 +43,5 @@ TEST_F(OShufflerTest, ShufflePreservesElements) {
     EXPECT_EQ(original_data, data);
 }
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
-
 
 // todo: 先使用uint32_t测试一下shuffle的整体正确性，在扩展oswap_buffer函数能够处理的类型，最后简化shuffle函数的实现

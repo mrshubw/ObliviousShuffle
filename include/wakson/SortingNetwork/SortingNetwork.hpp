@@ -28,7 +28,7 @@ template<OSwap_Style oswap_style, typename KeyType = uint64_t>
 void BitonicMerge(unsigned char *keys, size_t N, unsigned char *associated_data1,
       unsigned char *associated_data2, size_t data_size, bool ascend);
 
-void testBitonicSort();
+// void testBitonicSort();
 
 #include "SortingNetwork.tcc"
 #endif
