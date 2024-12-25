@@ -24,6 +24,8 @@
   //   #include "Enclave_globals.h"
   // #endif
 
+  #include <stdint.h>
+
   // Oblivious Buffer move/swap functions:
 	extern "C" void oswap_buffer_16x(unsigned char *dest, unsigned char *source, uint32_t buffersize, uint8_t flag);
 	extern "C" void oswap_buffer_byte(unsigned char *dest, unsigned char *source, uint32_t buffersize, uint8_t flag);

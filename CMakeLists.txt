@@ -33,6 +33,10 @@ add_executable(tests tests/test_bitonic_sorter.cpp)
 target_link_libraries(tests ObliviousShuffle gtest gtest_main)
 add_test(NAME TestBitonicSorter COMMAND tests)
 
+add_executable(testShuffler tests/test_shuffler.cpp)
+target_link_libraries(testShuffler ObliviousShuffle gtest gtest_main)
+add_test(NAME TestShuffler COMMAND testShuffler)
+
 add_executable(testOblPrimitives tests/test_obl_primitives.cpp)
 target_link_libraries(testOblPrimitives ObliviousShuffle gtest gtest_main)
 add_test(NAME TestOblPrimitives COMMAND testOblPrimitives)
