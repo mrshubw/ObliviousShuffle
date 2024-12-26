@@ -67,20 +67,7 @@ namespace obl
         block_size = attachTags(buf, N, block_size, tags, tags_buf);
 
         // 以tag为key，block为单位，进行bitonic排序
-        using KeyType = size_t;
-        bool ascend = true;
-        if(block_size==4){
-            BitonicSort<OSWAP_4, KeyType>(tags_buf, N, block_size, ascend);
-        } else if(block_size==8){
-            BitonicSort<OSWAP_8, KeyType>(tags_buf, N, block_size, ascend);
-        } else if(block_size==12){
-            BitonicSort<OSWAP_12, KeyType>(tags_buf, N, block_size, ascend);
-        } else if (block_size%16==0){
-            BitonicSort<OSWAP_16X, KeyType>(tags_buf, N, block_size, ascend);
-        }
-        else{
-            BitonicSort<OSWAP_8_16X, KeyType>(tags_buf, N, block_size, ascend);
-        }
+        BitonicSort<size_t>(tags_buf, N, block_size, true);
 
         // 移除tag
         block_size = detachTags(tags_buf, N, block_size, buf);

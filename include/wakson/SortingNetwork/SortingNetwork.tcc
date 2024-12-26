@@ -130,7 +130,7 @@ void BitonicMerge(unsigned char *buffer, size_t N, size_t block_size, bool ascen
 
 
 
-template<OSwap_Style oswap_style, typename KeyType = uint64_t>
+template<OSwap_Style oswap_style, typename KeyType>
 void BitonicSort(unsigned char *buffer, size_t N, size_t block_size, bool ascend) {
   FOAV_SAFE_CNTXT(BitonicSort, N)
   if(N < 2){
@@ -145,6 +145,28 @@ void BitonicSort(unsigned char *buffer, size_t N, size_t block_size, bool ascend
 }
 
 
+template<typename KeyType>
+void BitonicSort(unsigned char *buffer, size_t N, size_t block_size, bool ascend){
+  if(block_size==4){
+    BitonicSort<OSWAP_4, KeyType>(buffer, N, block_size, ascend);
+  } else if(block_size==8){
+    BitonicSort<OSWAP_8, KeyType>(buffer, N, block_size, ascend);
+  } else if(block_size==12){
+    BitonicSort<OSWAP_12, KeyType>(buffer, N, block_size, ascend);
+  } else if (block_size%16==0){
+    BitonicSort<OSWAP_16X, KeyType>(buffer, N, block_size, ascend);
+  }
+  else{
+    BitonicSort<OSWAP_8_16X, KeyType>(buffer, N, block_size, ascend);
+  }
+}
+
+template<typename KeyType>
+void BitonicSort(KeyType *buffer, size_t N, bool ascend){
+  BitonicSort<KeyType>(reinterpret_cast<unsigned char*>(buffer), N, sizeof(KeyType), ascend);
+}
+
+/* 
 template<OSwap_Style oswap_style, typename KeyType>
 void BitonicMerge(unsigned char *keys, size_t N, unsigned char *associated_data1, 
       unsigned char *associated_data2, size_t data_size, bool ascend) {
@@ -331,7 +353,7 @@ void BitonicSort(unsigned char *keys, size_t N, unsigned char *associated_data1,
   }
   
 }
-
+ */
 
 
 

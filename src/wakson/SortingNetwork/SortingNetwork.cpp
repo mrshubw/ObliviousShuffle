@@ -119,7 +119,7 @@ ascend: 1 = ascending
 // NOTE: 1) We assume keys are limited to 8 byte values!
 //       2) We assume associated_data1 and associated_data2 have the same data_size! This helps set
 //          the Oswap_Style cleanly!
-
+/* 
 void BitonicSort(unsigned char *keys, size_t N, unsigned char *associated_data1, unsigned char *associated_data2, size_t data_size, bool ascend) {
   if(data_size==4){
     BitonicSort<OSWAP_4>(keys, N, associated_data1, associated_data2, data_size, ascend);
@@ -131,21 +131,21 @@ void BitonicSort(unsigned char *keys, size_t N, unsigned char *associated_data1,
     BitonicSort<OSWAP_8_16X>(keys, N, associated_data1, associated_data2, data_size, ascend);
   }
 }
-
-void BitonicSort(unsigned char *buffer, size_t N, size_t block_size, bool ascend) {
-  if(block_size==4){
-    BitonicSort<OSWAP_4>(buffer, N, block_size, ascend);
-  } else if(block_size==8){
-    BitonicSort<OSWAP_8>(buffer, N, block_size, ascend);
-  } else if(block_size==12){
-    BitonicSort<OSWAP_12>(buffer, N, block_size, ascend);
-  } else if (block_size%16==0){
-    BitonicSort<OSWAP_16X>(buffer, N, block_size, ascend);
-  }
-  else{
-    BitonicSort<OSWAP_8_16X>(buffer, N, block_size, ascend);
-  }
-}
+ */
+// void BitonicSort(unsigned char *buffer, size_t N, size_t block_size, bool ascend) {
+//   if(block_size==4){
+//     BitonicSort<OSWAP_4>(buffer, N, block_size, ascend);
+//   } else if(block_size==8){
+//     BitonicSort<OSWAP_8>(buffer, N, block_size, ascend);
+//   } else if(block_size==12){
+//     BitonicSort<OSWAP_12>(buffer, N, block_size, ascend);
+//   } else if (block_size%16==0){
+//     BitonicSort<OSWAP_16X>(buffer, N, block_size, ascend);
+//   }
+//   else{
+//     BitonicSort<OSWAP_8_16X>(buffer, N, block_size, ascend);
+//   }
+// }
 /* 
 //TODO: Take this off, if we no longer plan to support SN_App!
 double DecryptAndBitonicSort(unsigned char *encrypted_buffer, uint64_t N, size_t encrypted_block_size,
