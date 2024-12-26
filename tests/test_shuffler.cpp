@@ -25,8 +25,27 @@ protected:
 };
 
 // 测试用例：检查shuffle之后元素数量和内容是否正确
-TEST_F(OShufflerTest, ShufflePreservesElements) {
+TEST_F(OShufflerTest, BitonicShufflePreservesElements) {
     obl::OShuffler shuffler;
+    std::vector<uint32_t> original_data(data);
+
+    shuffler.shuffle(buf, N, block_size);
+
+    print_array(data, N);
+    print_array(original_data, N);
+
+    // 对原始数据进行排序
+    std::sort(original_data.begin(), original_data.end());
+    // 对shuffle之后的数据进行排序
+    std::sort(data.begin(), data.end());
+
+    // 检查排序后的原始数据和shuffle之后的数据是否相同
+    EXPECT_EQ(original_data, data);
+}
+
+// 测试用例：检查shuffle之后元素数量和内容是否正确
+TEST_F(OShufflerTest, RecursiveShufflePreservesElements) {
+    obl::OShuffler shuffler(obl::OShuffler::Method::RecursiveShuffle);
     std::vector<uint32_t> original_data(data);
 
     shuffler.shuffle(buf, N, block_size);

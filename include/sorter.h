@@ -38,5 +38,7 @@ namespace obl {
                 BitonicSort<OSWAP_8_16X, KeyType>(buffer, N, block_size, ascend);
             }
         };
+
+        //TODO：oswap交换的类型和ogt比较的类型可以不一致，这种特质使得我们可以为每项添加tag实现shuffle
     };
 }
