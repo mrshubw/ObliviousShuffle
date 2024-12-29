@@ -12,6 +12,13 @@ add_library(ObliviousShuffle ${SRC})
 # 添加头文件目录
 target_include_directories(ObliviousShuffle PUBLIC include)
 
+# 启用 SSE、SSE2 和 AES 支持
+target_compile_options(ObliviousShuffle PRIVATE
+    $<$<CXX_COMPILER_ID:GNU>:-msse -msse2 -maes>   # 对于 GCC 和 Clang
+    $<$<CXX_COMPILER_ID:MSVC>:/arch:SSE2>             # 对于 MSVC
+)
+
+
 # 设置第三方库
 # 引入 FetchContent 模块
 include(FetchContent)

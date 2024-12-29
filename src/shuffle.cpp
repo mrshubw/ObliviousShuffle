@@ -1,4 +1,5 @@
 #include "shuffle.h"
+#include "wakson/WaksmanNetwork/WaksmanNetwork.hpp"
 
 namespace obl
 {
@@ -80,6 +81,38 @@ namespace obl
         RecursiveShuffle_M1(buf, N, block_size);
     }
 
+    void OShuffler::waksmanShuffle(uint8_t *buf, size_t N, size_t block_size){
+        uint32_t *random_permutation;
+        try {
+            random_permutation = new uint32_t[N];
+        } catch (std::bad_alloc&) {
+            printf("Allocating memory failed in OblivWaksmanShuffle\n");
+        }
+        // Generate random permutation
+        generateRandomPermutation(N, random_permutation);
+
+        // Set control bits to implement randomly generated permutation
+        WaksmanNetwork wnet((uint32_t) N);
+        //printf("\nSetting control bits\n");
+        wnet.setPermutation(random_permutation);
+
+        // Apply the permutation
+        //printf("\n Applying permutation\n");
+        if (block_size == 4) {
+            wnet.applyPermutation<OSWAP_4>(buf, block_size);
+        } else if (block_size == 8) {
+            wnet.applyPermutation<OSWAP_8>(buf, block_size);
+        } else if (block_size == 12) {
+            wnet.applyPermutation<OSWAP_12>(buf, block_size);
+        } else if (block_size%16 == 0) {
+            wnet.applyPermutation<OSWAP_16X>(buf, block_size);
+        } else {
+            wnet.applyPermutation<OSWAP_8_16X>(buf, block_size);
+        }
+
+        delete[] random_permutation;
+    }
+
     void OShuffler::shuffle(uint8_t *buf, size_t N, size_t block_size)
     {
         switch (method)
@@ -90,6 +123,10 @@ namespace obl
 
         case Method::RecursiveShuffle:
             recursiveShuffle(buf, N, block_size);
+            break;
+
+        case Method::WaksmanShuffle:
+            waksmanShuffle(buf, N, block_size);
             break;
         
         default:

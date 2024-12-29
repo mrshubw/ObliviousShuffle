@@ -10,7 +10,7 @@ namespace obl
     class OShuffler
     {
     public:
-        enum class Method {BitonicShuffle, RecursiveShuffle};
+        enum class Method {BitonicShuffle, RecursiveShuffle, WaksmanShuffle};
         Method method = Method::BitonicShuffle;
 
         OShuffler() {}
@@ -27,5 +27,6 @@ namespace obl
         size_t detachTags(uint8_t *tags_buf, size_t N, size_t block_size, uint8_t *buf);
         void bitonicShuffle(uint8_t *buf, size_t N, size_t block_size);
         void recursiveShuffle(uint8_t *buf, size_t N, size_t block_size);
+        void waksmanShuffle(uint8_t *buf, size_t N, size_t block_size);
     };
 }
