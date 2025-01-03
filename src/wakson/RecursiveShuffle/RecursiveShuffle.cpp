@@ -92,7 +92,11 @@ void MarkHalf(uint64_t N, bool *selected_list) {
 
     random_bytes_buffer_ptr = (uint32_t*) random_bytes_buffer;
     FOAV_SAFE_CNTXT(RS_M1_branching_on_block_size_for_OSwap_Style_templates, block_size)
-    if(block_size==4){
+    if (block_size == 1) {
+      RecursiveShuffle_M1_inner<OSWAP_1>(buf, N, block_size, selected_list);
+    } else if (block_size == 2) {
+      RecursiveShuffle_M1_inner<OSWAP_2>(buf, N, block_size, selected_list);
+    } else if(block_size==4){
       FOAV_SAFE_CNTXT(RS_M1_branching_on_block_size_for_OSwap_Style_templates, block_size)
       RecursiveShuffle_M1_inner<OSWAP_4>(buf, N, block_size, selected_list);
       FOAV_SAFE_CNTXT(RS_M1_branching_on_block_size_for_OSwap_Style_templates, block_size)
@@ -104,9 +108,13 @@ void MarkHalf(uint64_t N, bool *selected_list) {
       FOAV_SAFE_CNTXT(RS_M1_branching_on_block_size_for_OSwap_Style_templates, block_size)
       RecursiveShuffle_M1_inner<OSWAP_16X>(buf, N, block_size, selected_list);
       FOAV_SAFE_CNTXT(RS_M1_branching_on_block_size_for_OSwap_Style_templates, block_size)
-    } else {
+    } else if(block_size%8==0) {
       FOAV_SAFE_CNTXT(RS_M1_branching_on_block_size_for_OSwap_Style_templates, block_size)
       RecursiveShuffle_M1_inner<OSWAP_8_16X>(buf, N, block_size, selected_list);
+      FOAV_SAFE_CNTXT(RS_M1_branching_on_block_size_for_OSwap_Style_templates, block_size)
+    } else {
+      FOAV_SAFE_CNTXT(RS_M1_branching_on_block_size_for_OSwap_Style_templates, block_size)
+      RecursiveShuffle_M1_inner<OSWAP_ANY>(buf, N, block_size, selected_list);
       FOAV_SAFE_CNTXT(RS_M1_branching_on_block_size_for_OSwap_Style_templates, block_size)
     }
 

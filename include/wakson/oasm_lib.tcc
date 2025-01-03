@@ -4,6 +4,8 @@
 // #include "Enclave_globals.h"
 #include "foav.h"
 
+
+
 template<> inline void oswap_buffer<OSWAP_4>(unsigned char *dest, unsigned char *source, uint32_t buffersize, uint8_t flag)
 {
     #ifdef COUNT_OSWAPS
@@ -28,6 +30,28 @@ template<> inline void oswap_buffer<OSWAP_4>(unsigned char *dest, unsigned char 
         : "cc", "memory", "r10", "r11", "ecx"
     );
     #endif
+}
+
+template<> inline void oswap_buffer<OSWAP_1>(unsigned char *dest, unsigned char *source, uint32_t buffersize, uint8_t flag)
+{
+    uint32_t d = *(uint8_t*)dest;
+    uint32_t s = *(uint8_t*)source;
+
+    oswap_buffer<OSWAP_4>((unsigned char*)&d, (unsigned char*)&s, 4, flag);
+
+    *(uint8_t*)dest = (uint8_t)d;
+    *(uint8_t*)source = (uint8_t)s;
+}
+
+template<> inline void oswap_buffer<OSWAP_2>(unsigned char *dest, unsigned char *source, uint32_t buffersize, uint8_t flag)
+{
+    uint32_t d = *(uint16_t*)dest;
+    uint32_t s = *(uint16_t*)source;
+
+    oswap_buffer<OSWAP_4>((unsigned char*)&d, (unsigned char*)&s, 4, flag);
+
+    *(uint16_t*)dest = (uint16_t)d;
+    *(uint16_t*)source = (uint16_t)s;
 }
 
 template<> inline void oswap_buffer<OSWAP_8>(unsigned char *dest, unsigned char *source, uint32_t buffersize, uint8_t flag)
@@ -213,6 +237,44 @@ template<> inline void oswap_buffer<OSWAP_8_16X>(unsigned char *dest, unsigned c
     );
 
 
+}
+
+
+template<> inline void oswap_buffer<OSWAP_ANY>(unsigned char *dest, unsigned char *source, uint32_t buffersize, uint8_t flag){
+  if (buffersize / 16)
+  {
+    size_t num_16_iters = buffersize / 16;
+    oswap_buffer<OSWAP_16X>(dest, source, num_16_iters*16, flag);
+    dest += num_16_iters * 16;
+    source += num_16_iters * 16;
+    buffersize -= num_16_iters * 16;
+  }
+  if (buffersize / 8)
+  {
+    oswap_buffer<OSWAP_8>(dest, source, buffersize, flag);
+    dest += 8;
+    source += 8;
+    buffersize -= 8;
+  }
+  if (buffersize / 4)
+  {
+    oswap_buffer<OSWAP_4>(dest, source, buffersize, flag);
+    dest += 4;
+    source += 4;
+    buffersize -= 4;
+  }
+  if (buffersize / 2)
+  {
+    oswap_buffer<OSWAP_2>(dest, source, buffersize, flag);
+    dest += 2;
+    source += 2;
+    buffersize -= 2;
+  }
+  if (buffersize)
+  {
+    oswap_buffer<OSWAP_1>(dest, source, buffersize, flag);
+  }
+  
 }
 
 template<> inline void oswap_key<uint32_t>(unsigned char *dest, unsigned char *source, uint8_t flag)

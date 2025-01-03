@@ -147,7 +147,11 @@ void BitonicSort(unsigned char *buffer, size_t N, size_t block_size, bool ascend
 
 template<typename KeyType>
 void BitonicSort(unsigned char *buffer, size_t N, size_t block_size, bool ascend){
-  if(block_size==4){
+  if (block_size==1){
+    BitonicSort<OSWAP_1, KeyType>(buffer, N, block_size, ascend);
+  } else if(block_size==2){
+    BitonicSort<OSWAP_2, KeyType>(buffer, N, block_size, ascend);
+  } else if(block_size==4){
     BitonicSort<OSWAP_4, KeyType>(buffer, N, block_size, ascend);
   } else if(block_size==8){
     BitonicSort<OSWAP_8, KeyType>(buffer, N, block_size, ascend);
@@ -156,8 +160,10 @@ void BitonicSort(unsigned char *buffer, size_t N, size_t block_size, bool ascend
   } else if (block_size%16==0){
     BitonicSort<OSWAP_16X, KeyType>(buffer, N, block_size, ascend);
   }
-  else{
+  else if (block_size%8==0){
     BitonicSort<OSWAP_8_16X, KeyType>(buffer, N, block_size, ascend);
+  } else {
+    BitonicSort<OSWAP_ANY, KeyType>(buffer, N, block_size, ascend);
   }
 }
 

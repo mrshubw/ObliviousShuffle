@@ -47,7 +47,7 @@
     }
   }
 
-  enum OSwap_Style { OSWAP_4, OSWAP_8, OSWAP_12, OSWAP_16X, OSWAP_8_16X };
+  enum OSwap_Style {OSWAP_1, OSWAP_2, OSWAP_4, OSWAP_8, OSWAP_12, OSWAP_16X, OSWAP_8_16X, OSWAP_ANY };
   template<OSwap_Style oswap_style> inline void oswap_buffer(unsigned char *dest, unsigned char *source, uint32_t buffersize, uint8_t flag);
   template<typename KeyType> inline void oswap_key(unsigned char *dest, unsigned char *source, uint8_t flag);
 

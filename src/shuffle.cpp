@@ -123,7 +123,11 @@ namespace obl
 
         // Apply the permutation
         //printf("\n Applying permutation\n");
-        if (block_size == 4) {
+        if (block_size == 1) {
+            wnet->applyPermutation<OSWAP_1>(buf, block_size);
+        } else if (block_size == 2) {
+            wnet->applyPermutation<OSWAP_2>(buf, block_size);
+        } else if (block_size == 4) {
             wnet->applyPermutation<OSWAP_4>(buf, block_size);
         } else if (block_size == 8) {
             wnet->applyPermutation<OSWAP_8>(buf, block_size);
@@ -131,8 +135,10 @@ namespace obl
             wnet->applyPermutation<OSWAP_12>(buf, block_size);
         } else if (block_size%16 == 0) {
             wnet->applyPermutation<OSWAP_16X>(buf, block_size);
-        } else {
+        } else if (block_size%8 == 0) {
             wnet->applyPermutation<OSWAP_8_16X>(buf, block_size);
+        } else {
+            wnet->applyPermutation<OSWAP_ANY>(buf, block_size);
         }
 
         delete[] random_permutation;
@@ -210,7 +216,11 @@ namespace obl
             
         } else if (method == Method::WaksmanShuffle) {
             // 调用WaksmanNetwork的inversePermutation函数
-            if (block_size == 4) {
+            if (block_size == 1) {
+                wnet->applyInversePermutation<OSWAP_1>(buf, block_size);
+            } else if (block_size == 2) {
+                wnet->applyInversePermutation<OSWAP_2>(buf, block_size);
+            } else if (block_size == 4) {
                 wnet->applyInversePermutation<OSWAP_4>(buf, block_size);
             } else if (block_size == 8) {
                 wnet->applyInversePermutation<OSWAP_8>(buf, block_size);
@@ -218,8 +228,10 @@ namespace obl
                 wnet->applyInversePermutation<OSWAP_12>(buf, block_size);
             } else if (block_size%16 == 0) {
                 wnet->applyInversePermutation<OSWAP_16X>(buf, block_size);
-            } else {
+            } else if (block_size%8 == 0) {
                 wnet->applyInversePermutation<OSWAP_8_16X>(buf, block_size);
+            } else {
+                wnet->applyInversePermutation<OSWAP_ANY>(buf, block_size);
             }
         }
         

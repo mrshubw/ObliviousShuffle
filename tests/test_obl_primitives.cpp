@@ -1,97 +1,52 @@
 #include <gtest/gtest.h>
-#include "wakson/oasm_lib.h"  // 包含包含 oswap 函数的头文件
+#include "wakson/oasm_lib.h"  // 包含 oswap_buffer 的声明
 
-// 测试 oswap 函数
-TEST(OSwapTest, SwapBlocks) {
-    const size_t block_size = 4;  // 定义块大小
-    uint8_t block1[block_size] = {1, 2, 3, 4};
-    uint8_t block2[block_size] = {5, 6, 7, 8};
+// 测试 oswap_buffer<OSWAP_ANY> 的基本帧
+TEST(OswapBufferTest, BasicSwap) {
+    // 测试基础数据
+    unsigned char source[] = {1, 2, 3, 4, 5, 6, 7, 8};
+    unsigned char dest[] = {9, 10, 11, 12, 13, 14, 15, 16};
+    size_t buffersize = sizeof(source);
 
-    // 调用 oswap 函数进行交换
-    oswap(block1, block2, block_size, true);
+    // 调用 oswap_buffer 函数
+    oswap_buffer<OSWAP_ANY>(dest, source, buffersize, 1);
 
-    // 验证数据是否交换
-    EXPECT_EQ(block1[0], 5);
-    EXPECT_EQ(block1[1], 6);
-    EXPECT_EQ(block1[2], 7);
-    EXPECT_EQ(block1[3], 8);
-    EXPECT_EQ(block2[0], 1);
-    EXPECT_EQ(block2[1], 2);
-    EXPECT_EQ(block2[2], 3);
-    EXPECT_EQ(block2[3], 4);
-}
-
-TEST(OSwapTest, NoSwap) {
-    const size_t block_size = 4;  // 定义块大小
-    uint8_t block1[block_size] = {1, 2, 3, 4};
-    uint8_t block2[block_size] = {5, 6, 7, 8};
-
-    // 不进行交换
-    oswap(block1, block2, block_size, false);
-
-    // 验证数据未改变
-    EXPECT_EQ(block1[0], 1);
-    EXPECT_EQ(block1[1], 2);
-    EXPECT_EQ(block1[2], 3);
-    EXPECT_EQ(block1[3], 4);
-    EXPECT_EQ(block2[0], 5);
-    EXPECT_EQ(block2[1], 6);
-    EXPECT_EQ(block2[2], 7);
-    EXPECT_EQ(block2[3], 8);
-}
-
-// 模板测试函数
-template <typename T>
-void test_oswap() {
-    const size_t block_size = 4;  // 定义块大小
-    T block1[block_size] = {1, 2, 3, 4};
-    T block2[block_size] = {5, 6, 7, 8};
-
-    // 调用 oswap 函数进行交换
-    oswap(reinterpret_cast<uint8_t*>(block1), reinterpret_cast<uint8_t*>(block2), block_size * sizeof(T), true);
-
-    // 验证数据是否交换
-    for (size_t i = 0; i < block_size; ++i) {
-        EXPECT_EQ(block1[i], static_cast<T>(5 + i));  // 5, 6, 7, 8
-        EXPECT_EQ(block2[i], static_cast<T>(1 + i));  // 1, 2, 3, 4
+    // 验证交换结果
+    for (size_t i = 0; i < buffersize; ++i) {
+        EXPECT_EQ(dest[i], i + 1);  // dest 应该具有 source 的内容
+        EXPECT_EQ(source[i], i + 9); // source 应该具有原来的 dest 内容
     }
 }
 
-TEST(OSwapTest, SwapUInt8) {
-    test_oswap<uint8_t>();
+// 测试不同长度的内存交换
+TEST(OswapBufferTest, VariableLengthSwap) {
+    unsigned char source[24] = {1, 2, 3, 4, 5, 6, 7, 8,
+                                  9, 10, 11, 12, 13, 14, 15, 16,
+                                  17, 18, 19, 20, 21, 22, 23, 24};
+    unsigned char dest[24] = {25, 26, 27, 28, 29, 30, 31, 32,
+                               33, 34, 35, 36, 37, 38, 39, 40,
+                               41, 42, 43, 44, 45, 46, 47, 48};
+    
+    size_t buffersize = sizeof(source);
+
+    oswap_buffer<OSWAP_ANY>(dest, source, buffersize, 1);
+
+    // 验证交换结果
+    for (size_t i = 0; i < buffersize; ++i) {
+        EXPECT_EQ(dest[i], i + 1);
+        EXPECT_EQ(source[i], i + 25);
+    }
 }
 
-TEST(OSwapTest, SwapUInt16) {
-    test_oswap<uint16_t>();
+// 测试零字节交换
+TEST(OswapBufferTest, ZeroLengthSwap) {
+    unsigned char source[] = {1};
+    unsigned char dest[] = {2};
+    size_t buffersize = 0; // 不交换任何字节
+
+    oswap_buffer<OSWAP_ANY>(dest, source, buffersize, 1);
+
+    // 确保源和目标未改变
+    EXPECT_EQ(source[0], 1);
+    EXPECT_EQ(dest[0], 2);
 }
-
-TEST(OSwapTest, SwapUInt32) {
-    test_oswap<uint32_t>();
-}
-
-TEST(OSwapTest, SwapFloat) {
-    test_oswap<float>();
-}
-
-TEST(OSwapTest, SwapDouble) {
-    test_oswap<double>();
-}
-
-// string is not supported by oswap function temporarily
-// 测试 oswap 函数对 std::string 类型的交换能力
-// TEST(OSwapTest, SwapString) {
-//     std::string str1 = "Hello";
-//     std::string str2 = "World";
-
-//     // 提取 std::string 的地址并进行交换
-//     oswap(reinterpret_cast<uint8_t*>(&str1), reinterpret_cast<uint8_t*>(&str2), sizeof(std::string), true);
-
-//     // 结果可能各自持有原来的数据，导致未定义行为
-//     std::cout << str1 << std::endl; // 未定义行为
-//     std::cout << str2 << std::endl; // 未定义行为
-
-
-//     // 由于 std::string 结构体内部有不同成员，确保交换后的内容正确
-//     EXPECT_EQ(str1, "World");  // 期待 str1 变为 "World"
-//     EXPECT_EQ(str2, "Hello");  // 期待 str2 变为 "Hello"
-// }

@@ -65,7 +65,7 @@ protected:
 
 // TODO: 先使用uint32_t测试一下shuffle的整体正确性，在扩展oswap_buffer函数能够处理的类型后，使用多种不同长度的数据类型进行测试
 // 针对不同数据类型的测试实例化
-using ShufflerTypes = ::testing::Types<uint32_t, float>;
+using ShufflerTypes = ::testing::Types<uint32_t, float, double, int64_t, uint64_t>;
 
 TYPED_TEST_SUITE(OShufflerTest, ShufflerTypes);
 
