@@ -90,6 +90,8 @@ public:
   // N <= 2^31
   WaksmanNetwork(uint32_t N);
 
+  size_t numItems() const { return Ntotal; }
+
   void setPermutation(uint32_t *permutation);
 
   template <OSwap_Style oswap_style>

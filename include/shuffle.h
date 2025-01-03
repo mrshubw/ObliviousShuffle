@@ -22,6 +22,7 @@ namespace obl
         void shuffle(uint8_t *buf, size_t N, size_t block_size);
         // 逆shuffle,用于恢复原始顺序。BitonicShuffle和RecursiveShuffle的逆shuffle基于obliviousAssign函数，WaksmanShuffle的逆shuffle基于Waksman自带的inversePermutation函数。
         void inverseShuffle(uint8_t *buf, size_t block_size);
+        void inverseShuffle(uint8_t *buf, size_t block_size, uint8_t *out_buf, size_t offset=0);
 
     private:
         std::vector<TagType> idx; // 用于记录每一项在输入buf中的位置,BitonicShuffle和RecursiveShuffle需要

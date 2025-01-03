@@ -237,4 +237,44 @@ namespace obl
         
     }
 
+    void OShuffler::inverseShuffle(uint8_t *buf, size_t block_size, uint8_t *out_buf, size_t offset){
+        if (method == Method::BitonicShuffle || method == Method::RecursiveShuffle)
+        {
+            // 需要空间临时存放结果，否则shuffle结果会覆盖原buf
+            uint8_t *temp_buf = new uint8_t[idx.size() * block_size];
+
+            // 根据idx将shuffle结果恢复顺序
+            for (size_t i = 0; i < idx.size(); i++)
+            {
+                ObliviousArrayAssignBytes(temp_buf, buf + i * block_size, block_size, idx[i], idx.size());
+            }
+
+            // 将temp_buf中的内容复制到输出buf中
+            memcpy(out_buf, temp_buf + offset * block_size, (idx.size() - offset) * block_size);
+            
+        } else if (method == Method::WaksmanShuffle) {
+            // 调用WaksmanNetwork的inversePermutation函数
+            if (block_size == 1) {
+                wnet->applyInversePermutation<OSWAP_1>(buf, block_size);
+            } else if (block_size == 2) {
+                wnet->applyInversePermutation<OSWAP_2>(buf, block_size);
+            } else if (block_size == 4) {
+                wnet->applyInversePermutation<OSWAP_4>(buf, block_size);
+            } else if (block_size == 8) {
+                wnet->applyInversePermutation<OSWAP_8>(buf, block_size);
+            } else if (block_size == 12) {
+                wnet->applyInversePermutation<OSWAP_12>(buf, block_size);
+            } else if (block_size%16 == 0) {
+                wnet->applyInversePermutation<OSWAP_16X>(buf, block_size);
+            } else if (block_size%8 == 0) {
+                wnet->applyInversePermutation<OSWAP_8_16X>(buf, block_size);
+            } else {
+                wnet->applyInversePermutation<OSWAP_ANY>(buf, block_size);
+            }
+
+            // 将shuffle结果复制到输出buf中
+            memcpy(out_buf, buf + offset * block_size, (wnet->numItems() - offset) * block_size);
+        }
+    }
+
 }
