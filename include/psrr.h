@@ -33,9 +33,11 @@ namespace obl
         std::vector<uint8_t> result; // output data of retrieval
         size_t result_item_size; // size of each item in the output data
 
-        OShuffler shuffler; // shuffler used in shuffle() and response()
+        std::unique_ptr<OShuffler> shuffler; // shuffler used in shuffle() and response()
     public:
-        PSRR(double epsilon, double delta, double sensitivity) : epsilon(epsilon), delta(delta), sensitivity(sensitivity) {};
+        PSRR(double epsilon, double delta, double sensitivity, std::string shuffle_method="BitonicShuffle") : epsilon(epsilon), delta(delta), sensitivity(sensitivity) {
+            shuffler = OShuffler::create(shuffle_method);
+        };
         size_t total_items() const { return num_real_items + num_dummies; }
 
         void perturb(uint8_t* dummy_examples, size_t item_size, size_t num_dummy_examples);

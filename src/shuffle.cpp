@@ -4,7 +4,8 @@
 
 namespace obl
 {
-    size_t OShuffler::attachTags(uint8_t *buf, size_t N, size_t block_size, TagType *tags, uint8_t *tags_buf)
+    // 在数组的每一项前面添加一个tag，tag的类型为size_t。若tag随机选取，则根据tag排序能够实现shuffle输入buf
+    size_t attachTags(uint8_t *buf, size_t N, size_t block_size, TagType *tags, uint8_t *tags_buf)
     {
         size_t tag_size = sizeof(TagType);
         size_t block_size_with_tag = block_size + tag_size;
@@ -40,7 +41,8 @@ namespace obl
         return block_size_with_tag;
     }
 
-    size_t OShuffler::detachTags(uint8_t *tags_buf, size_t N, size_t block_size, uint8_t *buf){
+    // 去除attachTags函数中添加的tag，并将结果输出到buf中。
+    size_t detachTags(uint8_t *tags_buf, size_t N, size_t block_size, uint8_t *buf){
         size_t tag_size = sizeof(TagType);
         size_t real_block_size = block_size - tag_size;
 
@@ -61,7 +63,7 @@ namespace obl
         return real_block_size;
     }
 
-    size_t OShuffler::detachTags(uint8_t *tags_buf, size_t N, size_t block_size, uint8_t *buf, TagType *tags){
+    size_t detachTags(uint8_t *tags_buf, size_t N, size_t block_size, uint8_t *buf, TagType *tags){
         size_t tag_size = sizeof(TagType);
         size_t real_block_size = block_size - tag_size;
 
@@ -85,7 +87,81 @@ namespace obl
         return real_block_size;
     }
 
-    void OShuffler::bitonicShuffle(uint8_t *buf, size_t N, size_t block_size){
+    std::unique_ptr<OShuffler> OShuffler::create(std::string method){
+        if (method == "BitonicShuffle"){
+            return std::unique_ptr<OShuffler>(new BitonicShuffler());
+        } else if (method == "RecursiveShuffle"){
+            return std::unique_ptr<OShuffler>(new RecursiveShuffler());
+        } else if (method == "WaksmanShuffle"){
+            return std::unique_ptr<OShuffler>(new WaksmanShuffler());
+        } else {
+            printf("Invalid shuffle method\n");
+            return nullptr;
+        }
+    }
+
+    void OShufflerWithIndex::shuffle(uint8_t *buf, size_t N, size_t block_size){
+        uint8_t *buffer = buf;
+        // 当shuffle方法为bitonic shuffle或recursive shuffle时，需要添加索引idx表示每个block的原始位置
+        // 初始化添加了idx的buf
+        size_t block_size_with_idx = block_size + sizeof(TagType);
+        uint8_t *idx_buf = new uint8_t[N * block_size_with_idx];
+
+        // 初始化idx
+        idx.resize(N);
+        for (size_t i = 0; i < N; i++)
+        {
+            idx[i] = i;
+        }
+
+        // 添加idx到buf
+        attachTags(buf, N, block_size, idx.data(), idx_buf);
+
+        // 使用添加了idx的buf替代原buf进行shuffle
+        buffer = idx_buf;
+        block_size = block_size_with_idx;
+
+
+        shuffleKernel(buffer, N, block_size);
+
+
+        // 当shuffle方法为bitonic shuffle或recursive shuffle时，需要移除idx
+        // 移除idx
+        block_size = detachTags(buffer, N, block_size, buf, idx.data());
+
+        // 释放idx_buf
+        delete[] buffer;
+    }
+
+    void OShufflerWithIndex::inverseShuffle(uint8_t *buf, size_t block_size){
+        // 需要空间临时存放结果，否则shuffle结果会覆盖原buf
+        uint8_t *temp_buf = new uint8_t[idx.size() * block_size];
+
+        // 根据idx将shuffle结果恢复顺序
+        for (size_t i = 0; i < idx.size(); i++)
+        {
+            ObliviousArrayAssignBytes(temp_buf, buf + i * block_size, block_size, idx[i], idx.size());
+        }
+
+        // 将temp_buf中的内容复制到输出buf中
+        memcpy(buf, temp_buf, idx.size() * block_size);
+    }
+
+    void OShufflerWithIndex::inverseShuffle(uint8_t *buf, size_t block_size, uint8_t *out_buf, size_t offset){
+        // 需要空间临时存放结果，否则shuffle结果会覆盖原buf
+        uint8_t *temp_buf = new uint8_t[idx.size() * block_size];
+
+        // 根据idx将shuffle结果恢复顺序
+        for (size_t i = 0; i < idx.size(); i++)
+        {
+            ObliviousArrayAssignBytes(temp_buf, buf + i * block_size, block_size, idx[i], idx.size());
+        }
+
+        // 将temp_buf中的内容复制到输出buf中
+        memcpy(out_buf, temp_buf + offset * block_size, (idx.size() - offset) * block_size);
+    }
+
+    void BitonicShuffler::shuffleKernel(uint8_t *buf, size_t N, size_t block_size){
         // 添加随机tag
         TagType *tags = new TagType[N];
         PRB_buffer::getInstance().getBulkRandomBytes(reinterpret_cast<uint8_t *>(tags), N * sizeof(TagType));
@@ -102,11 +178,11 @@ namespace obl
         delete[] tags_buf;
     }
 
-    void OShuffler::recursiveShuffle(uint8_t *buf, size_t N, size_t block_size){
+    void RecursiveShuffler::shuffleKernel(uint8_t *buf, size_t N, size_t block_size){
         RecursiveShuffle_M1(buf, N, block_size);
     }
 
-    void OShuffler::waksmanShuffle(uint8_t *buf, size_t N, size_t block_size){
+    void WaksmanShuffler::shuffle(uint8_t *buf, size_t N, size_t block_size){
         uint32_t *random_permutation;
         try {
             random_permutation = new uint32_t[N];
@@ -144,137 +220,48 @@ namespace obl
         delete[] random_permutation;
     }
 
-    void OShuffler::shuffle(uint8_t *buf, size_t N, size_t block_size)
-    {
-        uint8_t *buffer = buf;
-        // 当shuffle方法为bitonic shuffle或recursive shuffle时，需要添加索引idx表示每个block的原始位置
-        if (method == Method::BitonicShuffle || method == Method::RecursiveShuffle)
-        {
-            // 初始化添加了idx的buf
-            size_t block_size_with_idx = block_size + sizeof(TagType);
-            uint8_t *idx_buf = new uint8_t[N * block_size_with_idx];
-
-            // 初始化idx
-            idx.resize(N);
-            for (size_t i = 0; i < N; i++)
-            {
-                idx[i] = i;
-            }
-
-            // 添加idx到buf
-            attachTags(buf, N, block_size, idx.data(), idx_buf);
-
-            // 使用添加了idx的buf替代原buf进行shuffle
-            buffer = idx_buf;
-            block_size = block_size_with_idx;
-        }
-
-        switch (method)
-        {
-        case Method::BitonicShuffle:
-            bitonicShuffle(buffer, N, block_size);
-            break;
-
-        case Method::RecursiveShuffle:
-            recursiveShuffle(buffer, N, block_size);
-            break;
-
-        case Method::WaksmanShuffle:
-            waksmanShuffle(buffer, N, block_size);
-            break;
-        
-        default:
-            std::cerr << "Invalid method" << std::endl;
-            break;
-        }
-
-        // 当shuffle方法为bitonic shuffle或recursive shuffle时，需要移除idx
-        if (method == Method::BitonicShuffle || method == Method::RecursiveShuffle)
-        {
-            // 移除idx
-            block_size = detachTags(buffer, N, block_size, buf, idx.data());
-
-            // 释放idx_buf
-            delete[] buffer;
-        }
-    };
-
-    void OShuffler::inverseShuffle(uint8_t *buf, size_t block_size){
-        if (method == Method::BitonicShuffle || method == Method::RecursiveShuffle)
-        {
-            // 需要空间临时存放结果，否则shuffle结果会覆盖原buf
-            uint8_t *temp_buf = new uint8_t[idx.size() * block_size];
-
-            // 根据idx将shuffle结果恢复顺序
-            for (size_t i = 0; i < idx.size(); i++)
-            {
-                ObliviousArrayAssignBytes(temp_buf, buf + i * block_size, block_size, idx[i], idx.size());
-            }
-
-            // 将temp_buf中的内容复制到输出buf中
-            memcpy(buf, temp_buf, idx.size() * block_size);
-            
-        } else if (method == Method::WaksmanShuffle) {
-            // 调用WaksmanNetwork的inversePermutation函数
-            if (block_size == 1) {
-                wnet->applyInversePermutation<OSWAP_1>(buf, block_size);
-            } else if (block_size == 2) {
-                wnet->applyInversePermutation<OSWAP_2>(buf, block_size);
-            } else if (block_size == 4) {
-                wnet->applyInversePermutation<OSWAP_4>(buf, block_size);
-            } else if (block_size == 8) {
-                wnet->applyInversePermutation<OSWAP_8>(buf, block_size);
-            } else if (block_size == 12) {
-                wnet->applyInversePermutation<OSWAP_12>(buf, block_size);
-            } else if (block_size%16 == 0) {
-                wnet->applyInversePermutation<OSWAP_16X>(buf, block_size);
-            } else if (block_size%8 == 0) {
-                wnet->applyInversePermutation<OSWAP_8_16X>(buf, block_size);
-            } else {
-                wnet->applyInversePermutation<OSWAP_ANY>(buf, block_size);
-            }
-        }
-        
-    }
-
-    void OShuffler::inverseShuffle(uint8_t *buf, size_t block_size, uint8_t *out_buf, size_t offset){
-        if (method == Method::BitonicShuffle || method == Method::RecursiveShuffle)
-        {
-            // 需要空间临时存放结果，否则shuffle结果会覆盖原buf
-            uint8_t *temp_buf = new uint8_t[idx.size() * block_size];
-
-            // 根据idx将shuffle结果恢复顺序
-            for (size_t i = 0; i < idx.size(); i++)
-            {
-                ObliviousArrayAssignBytes(temp_buf, buf + i * block_size, block_size, idx[i], idx.size());
-            }
-
-            // 将temp_buf中的内容复制到输出buf中
-            memcpy(out_buf, temp_buf + offset * block_size, (idx.size() - offset) * block_size);
-            
-        } else if (method == Method::WaksmanShuffle) {
-            // 调用WaksmanNetwork的inversePermutation函数
-            if (block_size == 1) {
-                wnet->applyInversePermutation<OSWAP_1>(buf, block_size);
-            } else if (block_size == 2) {
-                wnet->applyInversePermutation<OSWAP_2>(buf, block_size);
-            } else if (block_size == 4) {
-                wnet->applyInversePermutation<OSWAP_4>(buf, block_size);
-            } else if (block_size == 8) {
-                wnet->applyInversePermutation<OSWAP_8>(buf, block_size);
-            } else if (block_size == 12) {
-                wnet->applyInversePermutation<OSWAP_12>(buf, block_size);
-            } else if (block_size%16 == 0) {
-                wnet->applyInversePermutation<OSWAP_16X>(buf, block_size);
-            } else if (block_size%8 == 0) {
-                wnet->applyInversePermutation<OSWAP_8_16X>(buf, block_size);
-            } else {
-                wnet->applyInversePermutation<OSWAP_ANY>(buf, block_size);
-            }
-
-            // 将shuffle结果复制到输出buf中
-            memcpy(out_buf, buf + offset * block_size, (wnet->numItems() - offset) * block_size);
+    void WaksmanShuffler::inverseShuffle(uint8_t *buf, size_t block_size){
+        // 调用WaksmanNetwork的inversePermutation函数
+        if (block_size == 1) {
+            wnet->applyInversePermutation<OSWAP_1>(buf, block_size);
+        } else if (block_size == 2) {
+            wnet->applyInversePermutation<OSWAP_2>(buf, block_size);
+        } else if (block_size == 4) {
+            wnet->applyInversePermutation<OSWAP_4>(buf, block_size);
+        } else if (block_size == 8) {
+            wnet->applyInversePermutation<OSWAP_8>(buf, block_size);
+        } else if (block_size == 12) {
+            wnet->applyInversePermutation<OSWAP_12>(buf, block_size);
+        } else if (block_size%16 == 0) {
+            wnet->applyInversePermutation<OSWAP_16X>(buf, block_size);
+        } else if (block_size%8 == 0) {
+            wnet->applyInversePermutation<OSWAP_8_16X>(buf, block_size);
+        } else {
+            wnet->applyInversePermutation<OSWAP_ANY>(buf, block_size);
         }
     }
 
+    void WaksmanShuffler::inverseShuffle(uint8_t *buf, size_t block_size, uint8_t *out_buf, size_t offset){
+        // 调用WaksmanNetwork的inversePermutation函数
+        if (block_size == 1) {
+            wnet->applyInversePermutation<OSWAP_1>(buf, block_size);
+        } else if (block_size == 2) {
+            wnet->applyInversePermutation<OSWAP_2>(buf, block_size);
+        } else if (block_size == 4) {
+            wnet->applyInversePermutation<OSWAP_4>(buf, block_size);
+        } else if (block_size == 8) {
+            wnet->applyInversePermutation<OSWAP_8>(buf, block_size);
+        } else if (block_size == 12) {
+            wnet->applyInversePermutation<OSWAP_12>(buf, block_size);
+        } else if (block_size%16 == 0) {
+            wnet->applyInversePermutation<OSWAP_16X>(buf, block_size);
+        } else if (block_size%8 == 0) {
+            wnet->applyInversePermutation<OSWAP_8_16X>(buf, block_size);
+        } else {
+            wnet->applyInversePermutation<OSWAP_ANY>(buf, block_size);
+        }
+
+        // 将shuffle结果复制到输出buf中
+        memcpy(out_buf, buf + offset * block_size, (wnet->numItems() - offset) * block_size);
+    }
 }

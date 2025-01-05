@@ -19,11 +19,11 @@ protected:
         // 清理工作，如果有的话
     }
 
-    void verifyShuffle(obl::OShuffler::Method method) {
-        obl::OShuffler shuffler(method);
+    void verifyShuffle(std::string method) {
+        auto shuffler = obl::OShuffler::create(method);
         std::vector<T> original_data(data);
 
-        shuffler.shuffle(buf, N, block_size);
+        shuffler->shuffle(buf, N, block_size);
 
         print_array(data, N);           // 确保print_array能够处理T类型
         print_array(original_data, N);  // 确保print_array能够处理T类型
@@ -37,18 +37,18 @@ protected:
         EXPECT_EQ(original_data, data);
     }
 
-    void verifyInverseShuffle(obl::OShuffler::Method method) {
-        obl::OShuffler shuffler(method);
+    void verifyInverseShuffle(std::string method) {
+        auto shuffler = obl::OShuffler::create(method);
         std::vector<T> original_data(data);
 
         // 先进行Shuffle操作
-        shuffler.shuffle(buf, N, block_size);
+        shuffler->shuffle(buf, N, block_size);
 
         // 保存Shuffle后的数据
         std::vector<T> shuffled_data(data);
 
         // 调用inverseShuffle恢复数据顺序
-        shuffler.inverseShuffle(buf, block_size);
+        shuffler->inverseShuffle(buf, block_size);
 
         // 打印恢复后的数据
         print_array(data, N);
@@ -71,30 +71,30 @@ TYPED_TEST_SUITE(OShufflerTest, ShufflerTypes);
 
 // 测试用例：检查Bitonic Shuffle是否保持元素
 TYPED_TEST(OShufflerTest, BitonicShufflePreservesElements) {
-    this->verifyShuffle(obl::OShuffler::Method::BitonicShuffle);
+    this->verifyShuffle("BitonicShuffle");
 }
 
 // 测试用例：检查Recursive Shuffle是否保持元素
 TYPED_TEST(OShufflerTest, RecursiveShufflePreservesElements) {
-    this->verifyShuffle(obl::OShuffler::Method::RecursiveShuffle);
+    this->verifyShuffle("RecursiveShuffle");
 }
 
 // 测试用例：检查Waksman Shuffle是否保持元素
 TYPED_TEST(OShufflerTest, WaksmanShufflePreservesElements) {
-    this->verifyShuffle(obl::OShuffler::Method::WaksmanShuffle);
+    this->verifyShuffle("WaksmanShuffle");
 }
 
 // 测试用例：检查Bitonic Shuffle的inverseShuffle是否能够正确恢复数据顺序
 TYPED_TEST(OShufflerTest, BitonicInverseShuffleRestoresOrder) {
-    this->verifyInverseShuffle(obl::OShuffler::Method::BitonicShuffle);
+    this->verifyInverseShuffle("BitonicShuffle");
 }
 
 // 测试用例：检查Recursive Shuffle的inverseShuffle是否能够正确恢复数据顺序
 TYPED_TEST(OShufflerTest, RecursiveInverseShuffleRestoresOrder) {
-    this->verifyInverseShuffle(obl::OShuffler::Method::RecursiveShuffle);
+    this->verifyInverseShuffle("RecursiveShuffle");
 }
 
 // 测试用例：检查Waksman Shuffle的inverseShuffle是否能够正确恢复数据顺序
 TYPED_TEST(OShufflerTest, WaksmanInverseShuffleRestoresOrder) {
-    this->verifyInverseShuffle(obl::OShuffler::Method::WaksmanShuffle);
+    this->verifyInverseShuffle("WaksmanShuffle");
 }

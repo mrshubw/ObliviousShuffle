@@ -88,7 +88,7 @@ namespace obl
         num_real_items = num_items;
 
         // 调用shuffle函数混洗输入数据与dummy
-        shuffler.shuffle(data.data(), num_items + num_dummies, item_size);
+        shuffler->shuffle(data.data(), num_items + num_dummies, item_size);
     }
 
     void PSRR::retrieve(std::function<void(uint8_t*, uint8_t*)> func, size_t result_item_size){
@@ -103,6 +103,6 @@ namespace obl
     }
 
     void PSRR::response(uint8_t* output){
-        shuffler.inverseShuffle(result.data(), result_item_size, output, num_dummies*result_item_size);
+        shuffler->inverseShuffle(result.data(), result_item_size, output, num_dummies*result_item_size);
     }
 }
