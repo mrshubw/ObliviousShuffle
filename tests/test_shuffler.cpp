@@ -71,30 +71,30 @@ TYPED_TEST_SUITE(OShufflerTest, ShufflerTypes);
 
 // 测试用例：检查Bitonic Shuffle是否保持元素
 TYPED_TEST(OShufflerTest, BitonicShufflePreservesElements) {
-    this->verifyShuffle("BitonicShuffle");
+    this->verifyShuffle("BitonicShuffler");
 }
 
 // 测试用例：检查Recursive Shuffle是否保持元素
 TYPED_TEST(OShufflerTest, RecursiveShufflePreservesElements) {
-    this->verifyShuffle("RecursiveShuffle");
+    this->verifyShuffle("RecursiveShuffler");
 }
 
 // 测试用例：检查Waksman Shuffle是否保持元素
 TYPED_TEST(OShufflerTest, WaksmanShufflePreservesElements) {
-    this->verifyShuffle("WaksmanShuffle");
+    this->verifyShuffle("WaksmanShuffler");
 }
 
 // 测试用例：检查Bitonic Shuffle的inverseShuffle是否能够正确恢复数据顺序
 TYPED_TEST(OShufflerTest, BitonicInverseShuffleRestoresOrder) {
-    this->verifyInverseShuffle("BitonicShuffle");
+    this->verifyInverseShuffle("BitonicShuffler");
 }
 
 // 测试用例：检查Recursive Shuffle的inverseShuffle是否能够正确恢复数据顺序
 TYPED_TEST(OShufflerTest, RecursiveInverseShuffleRestoresOrder) {
-    this->verifyInverseShuffle("RecursiveShuffle");
+    this->verifyInverseShuffle("RecursiveShuffler");
 }
 
 // 测试用例：检查Waksman Shuffle的inverseShuffle是否能够正确恢复数据顺序
 TYPED_TEST(OShufflerTest, WaksmanInverseShuffleRestoresOrder) {
-    this->verifyInverseShuffle("WaksmanShuffle");
+    this->verifyInverseShuffle("WaksmanShuffler");
 }

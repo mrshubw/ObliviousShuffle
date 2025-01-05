@@ -35,7 +35,7 @@ namespace obl
 
         std::unique_ptr<OShuffler> shuffler; // shuffler used in shuffle() and response()
     public:
-        PSRR(double epsilon, double delta, double sensitivity, std::string shuffle_method="BitonicShuffle") : epsilon(epsilon), delta(delta), sensitivity(sensitivity) {
+        PSRR(double epsilon, double delta, double sensitivity, std::string shuffle_method="BitonicShuffler") : epsilon(epsilon), delta(delta), sensitivity(sensitivity) {
             shuffler = OShuffler::create(shuffle_method);
         };
         size_t total_items() const { return num_real_items + num_dummies; }

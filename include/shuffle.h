@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <memory> 
+#include <functional>
 #include "wakson/RecursiveShuffle/RecursiveShuffle.hpp"
 #include "wakson/WaksmanNetwork/WaksmanNetwork.hpp"
 #include "sorter.h"
@@ -22,12 +23,6 @@ namespace obl
         virtual void inverseShuffle(uint8_t *buf, size_t block_size, uint8_t *out_buf, size_t offset=0) = 0;
 
         static std::unique_ptr<OShuffler> create(std::string method);
-
-    protected:
-        std::string method;
-        // void bitonicShuffle(uint8_t *buf, size_t N, size_t block_size);
-        // void recursiveShuffle(uint8_t *buf, size_t N, size_t block_size);
-        // void waksmanShuffle(uint8_t *buf, size_t N, size_t block_size);
     };
 
     class OShufflerWithIndex : public OShuffler
@@ -42,38 +37,56 @@ namespace obl
 
         virtual void shuffleKernel(uint8_t *buf, size_t N, size_t block_size) = 0;
     };
+    
+    using OShufflerCreatorFunc_t = std::function<std::unique_ptr<OShuffler>()>;
+    using OShufflerCreatorMap_t = std::unordered_map<std::string, OShufflerCreatorFunc_t>;
+    static OShufflerCreatorMap_t& getOShufflerCreatorMap() {
+        static OShufflerCreatorMap_t creatorMap;
+        return creatorMap;
+    }
+    template<typename T>
+    bool registerOShufflerCreator() {
+        getOShufflerCreatorMap()[T::ClassName()] = []() { return std::make_unique<T>(); };
+        return true;
+    }
 
     class BitonicShuffler : public OShufflerWithIndex
     {
     public:
-        BitonicShuffler() {
-            method = "BitonicShuffle";
+        static std::string ClassName() {
+            return "BitonicShuffler";
         }
     private:
+        static bool isRegistered;
+
         void shuffleKernel(uint8_t *buf, size_t N, size_t block_size) override;
     };
 
     class RecursiveShuffler : public OShufflerWithIndex
     {
     public:
-        RecursiveShuffler() {
-            method = "RecursiveShuffle";
+        static std::string ClassName() {
+            return "RecursiveShuffler";
         }
     private:
+        static bool isRegistered;
+
         void shuffleKernel(uint8_t *buf, size_t N, size_t block_size) override;
     };
 
     class WaksmanShuffler : public OShuffler
     {
     public:
-        WaksmanShuffler() {
-            method = "WaksmanShuffle";
+        static std::string ClassName() {
+            return "WaksmanShuffler";
         }
         void shuffle(uint8_t *buf, size_t N, size_t block_size) override;
         void inverseShuffle(uint8_t *buf, size_t block_size) override;
         void inverseShuffle(uint8_t *buf, size_t block_size, uint8_t *out_buf, size_t offset=0) override;
 
     private:
+        static bool isRegistered;
+
         std::unique_ptr<WaksmanNetwork> wnet; // WaksmanShuffle需要的网络结构
     };
 }

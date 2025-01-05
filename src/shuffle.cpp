@@ -4,6 +4,9 @@
 
 namespace obl
 {
+    bool BitonicShuffler::isRegistered = registerOShufflerCreator<BitonicShuffler>();
+    bool RecursiveShuffler::isRegistered = registerOShufflerCreator<RecursiveShuffler>();
+
     // 在数组的每一项前面添加一个tag，tag的类型为size_t。若tag随机选取，则根据tag排序能够实现shuffle输入buf
     size_t attachTags(uint8_t *buf, size_t N, size_t block_size, TagType *tags, uint8_t *tags_buf)
     {
@@ -88,16 +91,12 @@ namespace obl
     }
 
     std::unique_ptr<OShuffler> OShuffler::create(std::string method){
-        if (method == "BitonicShuffle"){
-            return std::unique_ptr<OShuffler>(new BitonicShuffler());
-        } else if (method == "RecursiveShuffle"){
-            return std::unique_ptr<OShuffler>(new RecursiveShuffler());
-        } else if (method == "WaksmanShuffle"){
-            return std::unique_ptr<OShuffler>(new WaksmanShuffler());
-        } else {
-            printf("Invalid shuffle method\n");
+        auto creator_iter = getOShufflerCreatorMap().find(method);
+        if (creator_iter == getOShufflerCreatorMap().end()) {
+            printf("No such shuffler method: %s\n", method.c_str());
             return nullptr;
         }
+        return creator_iter->second();
     }
 
     void OShufflerWithIndex::shuffle(uint8_t *buf, size_t N, size_t block_size){
@@ -181,6 +180,8 @@ namespace obl
     void RecursiveShuffler::shuffleKernel(uint8_t *buf, size_t N, size_t block_size){
         RecursiveShuffle_M1(buf, N, block_size);
     }
+
+    bool WaksmanShuffler::isRegistered = registerOShufflerCreator<WaksmanShuffler>();
 
     void WaksmanShuffler::shuffle(uint8_t *buf, size_t N, size_t block_size){
         uint32_t *random_permutation;
