@@ -243,23 +243,7 @@ namespace obl
 
     void WaksmanShuffler::inverseShuffle(uint8_t *buf, size_t block_size, uint8_t *out_buf, size_t offset){
         // 调用WaksmanNetwork的inversePermutation函数
-        if (block_size == 1) {
-            wnet->applyInversePermutation<OSWAP_1>(buf, block_size);
-        } else if (block_size == 2) {
-            wnet->applyInversePermutation<OSWAP_2>(buf, block_size);
-        } else if (block_size == 4) {
-            wnet->applyInversePermutation<OSWAP_4>(buf, block_size);
-        } else if (block_size == 8) {
-            wnet->applyInversePermutation<OSWAP_8>(buf, block_size);
-        } else if (block_size == 12) {
-            wnet->applyInversePermutation<OSWAP_12>(buf, block_size);
-        } else if (block_size%16 == 0) {
-            wnet->applyInversePermutation<OSWAP_16X>(buf, block_size);
-        } else if (block_size%8 == 0) {
-            wnet->applyInversePermutation<OSWAP_8_16X>(buf, block_size);
-        } else {
-            wnet->applyInversePermutation<OSWAP_ANY>(buf, block_size);
-        }
+        inverseShuffle(buf, block_size);
 
         // 将shuffle结果复制到输出buf中
         memcpy(out_buf, buf + offset * block_size, (wnet->numItems() - offset) * block_size);
