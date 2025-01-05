@@ -74,6 +74,9 @@ namespace obl
         void shuffleKernel(uint8_t *buf, size_t N, size_t block_size) override;
     };
 
+    // #define ENABLE_WAKSMAN_SHUFFLE
+    #ifdef ENABLE_WAKSMAN_SHUFFLE
+
     class WaksmanShuffler : public OShuffler
     {
     public:
@@ -89,4 +92,5 @@ namespace obl
 
         std::unique_ptr<WaksmanNetwork> wnet; // WaksmanShuffle需要的网络结构
     };
+    #endif // ENABLE_WAKSMAN_SHUFFLE
 }

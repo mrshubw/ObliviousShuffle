@@ -181,6 +181,8 @@ namespace obl
         RecursiveShuffle_M1(buf, N, block_size);
     }
 
+    #ifdef ENABLE_WAKSMAN_SHUFFLE
+
     bool WaksmanShuffler::isRegistered = registerOShufflerCreator<WaksmanShuffler>();
 
     void WaksmanShuffler::shuffle(uint8_t *buf, size_t N, size_t block_size){
@@ -249,4 +251,5 @@ namespace obl
         // 将shuffle结果复制到输出buf中
         memcpy(out_buf, buf + offset * block_size, (wnet->numItems() - offset) * block_size);
     }
+    #endif // ENABLE_WAKSON_SHUFFLE
 }
