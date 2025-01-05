@@ -1,6 +1,8 @@
 #ifndef __WAKSMANNETWORK_HPP__
 #define __WAKSMANNETWORK_HPP__
 
+#ifdef ENABLE_WAKSMAN_SHUFFLE 
+
 #include <unordered_map>
 #include <vector>
 #include "../oasm_lib.h"
@@ -358,5 +360,7 @@ void generateRandomPermutation(size_t N, T *random_permutation){
   printf("\n");
   */
 }
+
+#endif
 
 #endif

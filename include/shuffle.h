@@ -46,7 +46,8 @@ namespace obl
     }
     template<typename T>
     bool registerOShufflerCreator() {
-        getOShufflerCreatorMap()[T::ClassName()] = []() { return std::make_unique<T>(); };
+        
+        getOShufflerCreatorMap()[T::ClassName()] = []() { return std::unique_ptr<OShuffler>(new T()); };
         return true;
     }
 
@@ -74,7 +75,6 @@ namespace obl
         void shuffleKernel(uint8_t *buf, size_t N, size_t block_size) override;
     };
 
-    // #define ENABLE_WAKSMAN_SHUFFLE
     #ifdef ENABLE_WAKSMAN_SHUFFLE
 
     class WaksmanShuffler : public OShuffler

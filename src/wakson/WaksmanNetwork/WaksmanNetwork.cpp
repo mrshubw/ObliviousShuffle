@@ -1,3 +1,5 @@
+#ifdef ENABLE_WAKSMAN_SHUFFLE 
+
 #include "wakson/WaksmanNetwork/WaksmanNetwork.hpp"
 
 // Count the number of input and output switches, and the number of
@@ -963,3 +965,5 @@ void DecryptAndOWSS(unsigned char *encrypted_buffer, uint32_t N,
   return;
 }
  */
+
+#endif

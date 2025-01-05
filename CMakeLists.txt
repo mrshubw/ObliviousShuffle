@@ -18,6 +18,13 @@ target_compile_options(ObliviousShuffle PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/arch:SSE2>             # 对于 MSVC
 )
 
+option(ENABLE_WAKSMAN_SHUFFLE "Enable Waksman Shuffler" OFF)
+
+if(ENABLE_WAKSMAN_SHUFFLE)
+    target_compile_definitions(ObliviousShuffle PRIVATE ENABLE_WAKSMAN_SHUFFLE)
+endif()
+
+
 # # 添加测试目录
 # add_subdirectory(tests)
 

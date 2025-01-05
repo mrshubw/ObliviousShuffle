@@ -1,5 +1,8 @@
 #ifndef __AES_HPP__
 #define __AES_HPP__
+
+#ifdef ENABLE_WAKSMAN_SHUFFLE 
+
 // #include <emmintrin.h>
 #include <wmmintrin.h>
 /* Based on reference code from the Intel AES-NI whitepaper
@@ -124,5 +127,7 @@ static inline void AES_ECB_encrypt(__m128i &ciphertext, __m128i plaintext,
     tmp = _mm_aesenclast_si128 (tmp,key[j]);
     ciphertext=tmp;
 }
+
+#endif
 
 #endif

@@ -24,7 +24,8 @@
   //   #include "Enclave_globals.h"
   // #endif
 
-  #include <stdint.h>
+#include <stdint.h>  // 提供 uint8_t, uint32_t 等类型
+#include <stddef.h>  // 提供 size_t 类型
 /* 
   // Oblivious Buffer move/swap functions:
 	extern "C" void oswap_buffer_16x(unsigned char *dest, unsigned char *source, uint32_t buffersize, uint8_t flag);
